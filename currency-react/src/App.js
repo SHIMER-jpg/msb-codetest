@@ -33,7 +33,7 @@ const App = () => {
           />
         </div>
         {tab === "getRate" && <GetRate currencyList={currencyList} />}
-        {tab === "rateHistory" && <RateHistory />}
+        {tab === "rateHistory" && <RateHistory currencyList={currencyList} />}
       </div>
     </div>
   );

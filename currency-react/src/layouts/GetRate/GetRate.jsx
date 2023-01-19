@@ -6,7 +6,7 @@ export const GetRate = ({ currencyList }) => {
   const [form, setForm] = useState({
     amount: 0,
     base: "USD",
-    symbols: currencyList[0],
+    symbols: "",
     date: new Date().toISOString().split('T')[0]
   })
 
@@ -15,6 +15,9 @@ export const GetRate = ({ currencyList }) => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault()
+      if (form.symbols === "")
+        setResultLabel("Select a currency first")
+
       const { data } = await axios.post("http://localhost:8888/api/0.2", { ...form })
       const firstResult = data.results[0]
       setResultLabel(`${data.amount} ${firstResult.from} = ${firstResult.fullResult} ${firstResult.to}`)
