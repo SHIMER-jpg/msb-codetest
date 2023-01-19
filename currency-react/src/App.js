@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
@@ -6,8 +6,19 @@ import { Button } from "./components/Button/Button";
 import { GetRate } from "./layouts/GetRate/GetRate";
 import { RateHistory } from "./layouts/RateHistory/RateHistory";
 
+import { getCurrencies } from "./queries/getCurrencies";
+
 const App = () => {
   const [tab, setTab] = useState("getRate"); //getRate ||rateHistory
+  const [currencyList, setCurrencyList] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: currencies } = await getCurrencies();
+      setCurrencyList(Object.keys(currencies));
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -21,7 +32,7 @@ const App = () => {
             label="Rate 30 Day History"
           />
         </div>
-        {tab === "getRate" && <GetRate />}
+        {tab === "getRate" && <GetRate currencyList={currencyList} />}
         {tab === "rateHistory" && <RateHistory />}
       </div>
     </div>
