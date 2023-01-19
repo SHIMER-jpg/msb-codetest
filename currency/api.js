@@ -2,6 +2,8 @@ var rest = require('restler');
 var apiUrl = 'https://openexchangerates.org/api/historical/';
 var APP_ID = 'c45dde88452e4c8a8bc8eba812cb8eda';
 
+var DATE_REGEX = /^d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
+
 var self = (module.exports = {
   ver001: (data, res) => {
     if (data.symbols && typeof data.symbols !== 'string') {
@@ -21,6 +23,13 @@ var self = (module.exports = {
       self.sendResponse(res, 403, 'Please provide the date as a string');
       return;
     }
+
+    // validate that date is valid
+    if (DATE_REGEX.test(data.date)) {
+      self.sendResponse(res,403,'Please provide a valid date in format "yyyy-mm-dd"');
+      return;
+    }
+
     var date = data.date;
 
     // build the API call URL
