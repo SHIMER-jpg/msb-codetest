@@ -59,6 +59,57 @@ var self = (module.exports = {
       }
     });
   },
+  ver002: async (data, res) => {
+
+    const { symbols, date, base, amount } = data
+
+    if (!symbols && typeof symbols !== 'string') {
+      self.sendResponse(res, 403, 'Please provide the symbols as a string');
+      return;    
+    }
+
+    // validate that an amount is provided
+    if (typeof amount === 'undefined' || amount === '') {
+      self.sendResponse(res, 403, 'Please supply an amount to convert');
+      return;
+    }
+
+    if (typeof date !== 'string') {
+      self.sendResponse(res, 403, 'Please provide the date as a string');
+      return;
+    }
+
+    // validate that date is valid
+    if (!DATE_REGEX.test(date)) {
+      self.sendResponse(res,403,'Please provide a valid date in format "yyyy-mm-dd"');
+      return;
+    }
+
+    // build the API call URL
+    const url = apiUrl + date + '.json?&symbols=' + symbols.toUpperCase() + '&app_id=' + APP_ID;
+
+    console.log('Calling OpenExchangeRates API at: ', url);
+
+    const apiRequest = await fetch(url)    
+    const result =await  apiRequest.json()
+    if (apiRequest.status == 200) {
+      self.sendResponse(res, 200, {
+        base: base,
+        amount: amount,
+        results: self.convertAmount(amount, result),
+        dated: date,
+      })
+    }
+    if (apiRequest.status == 400) {
+      self.sendResponse(res, 400, 'Bad Request: '+ result.description);
+    }
+    if (apiRequest.status == 401) {
+      self.sendResponse(res, 401, 'Not Authorized: '+ result.description);
+    }
+    if (apiRequest.status == 502) {
+      self.sendResponse(res, 502, 'Api Error: '+ result.description);
+    }
+  },
 
   convertAmount: (amount, data) => {
     var rates = data.rates;
