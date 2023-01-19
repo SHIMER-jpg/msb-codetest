@@ -61,7 +61,7 @@ var self = (module.exports = {
   },
   //We don't allow switching BASE currencies because the API requires payment
   ver002: async (data, res) => {
-    const { symbols, date, amount } = data
+    const { symbols, date, amount, base } = data
 
     if (!symbols && typeof symbols !== 'string') {
       self.sendResponse(res, 403, 'Please provide the symbols as a string');
@@ -99,15 +99,19 @@ var self = (module.exports = {
         results: self.convertAmount(amount, result),
         dated: date,
       })
+      return
     }
     if (apiRequest.status == 400) {
       self.sendResponse(res, 400, 'Bad Request: '+ result.description);
+      return
     }
     if (apiRequest.status == 401) {
       self.sendResponse(res, 401, 'Not Authorized: '+ result.description);
+      return
     }
     if (apiRequest.status == 502) {
       self.sendResponse(res, 502, 'Api Error: '+ result.description);
+      return
     }
 
     self.sendResponse(res,apiRequest.status,result)
